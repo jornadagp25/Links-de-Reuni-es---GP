@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login do CD</title>
+  <style>
+    body {
+      background-color: #2f2f2f;
+      font-family: Arial, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background-color: #fff;
+      color: #000;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      color: #b30000;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 1rem;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    input[type="password"] {
+      text-transform: none;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 2rem;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Login do CD</h2>
+    <label for="login">Login:</label>
+    <input type="text" id="login" placeholder="LOGIN DO CD" />
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" placeholder="SOMENTE NÚMEROS" maxlength="10" />
+
+    <button onclick="fazerLogin()">Entrar</button>
+
+    <div class="error" id="erroLogin"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDl3le9WzRgcjFdRnG2QEwu8ESRJKTkzUM",
+      authDomain: "jornada25gp.firebaseapp.com",
+      projectId: "jornada25gp",
+      storageBucket: "jornada25gp.appspot.com",
+      messagingSenderId: "138229185117",
+      appId: "1:138229185117:web:e96ccf80e4109a511f6bb4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fazerLogin() {
+      const loginInput = document.getElementById('login').value.trim().toUpperCase();
+      const senhaInput = document.getElementById('senha').value.trim();
+      const erroDiv = document.getElementById('erroLogin');
+
+      if (!loginInput || !senhaInput) {
+        erroDiv.textContent = "Preencha todos os campos.";
+        return;
+      }
+
+      const querySnapshot = await getDocs(collection(db, "cds"));
+      let autenticado = false;
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.login === loginInput && data.senha === senhaInput) {
+          localStorage.setItem("cd_nome", data.cd);
+          localStorage.setItem("cd_login", data.login);
+          autenticado = true;
+        }
+      });
+
+      if (autenticado) {
+        window.location.href = "cadastro_sala.html";
+      } else {
+        erroDiv.textContent = "Login ou senha inválidos.";
+      }
+    }
+  </script>
+
+</body>
+</html>
